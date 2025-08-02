@@ -98,8 +98,17 @@ export default function Home() {
       <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
         <nav className="container-max flex items-center justify-between py-4">
           <div className="flex items-center space-x-8">
-            <div className="text-2xl font-bold text-primary-600">
-              eas<span className="text-secondary-600">CE</span>
+            <div className="flex items-center space-x-2">
+              <Image 
+                src="/logo.png" 
+                alt="easCE Logo" 
+                width={40} 
+                height={40} 
+                className="rounded-lg"
+              />
+              <div className="text-2xl font-bold text-primary-600">
+                eas<span className="text-secondary-600">CE</span>
+              </div>
             </div>
             <div className="hidden md:flex space-x-6">
               <a href="#home" className="text-gray-700 hover:text-primary-600 transition-colors">Home</a>
