@@ -91,6 +91,11 @@ export default function Practice() {
   };
 
   const handleNext = () => {
+    if (!questions || questions.length === 0) {
+      console.error('No questions available');
+      return;
+    }
+    
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedOption(null);

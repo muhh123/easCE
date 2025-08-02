@@ -109,15 +109,8 @@ export default function Dashboard() {
         <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
           <nav className="container-max flex items-center justify-between py-4">
             <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-2">
-                <img 
-                  src="/logo.png" 
-                  alt="easCE Logo" 
-                  className="h-10 w-10 rounded-lg"
-                />
-                <div className="text-2xl font-bold text-primary-600">
-                  eas<span className="text-secondary-600">CE</span>
-                </div>
+              <div className="text-2xl font-bold text-primary-600">
+                eas<span className="text-secondary-600">CE</span>
               </div>
               <div className="hidden md:flex space-x-6">
               {/* Navigation items can be added here later if needed */}

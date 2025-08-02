@@ -1,6 +1,7 @@
-import { useState, useEffect, FormEvent } from 'react'
+import { useState, useEffect, FormEvent, useRef } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import { 
   Calculator, 
   Droplets, 
@@ -40,6 +41,15 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
+
+  // Smooth scroll function
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+    e.preventDefault();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Check for authenticated user on mount and redirect if needed
   useEffect(() => {
@@ -107,25 +117,33 @@ export default function Home() {
       <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
         <nav className="container-max flex items-center justify-between py-4">
           <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-2">
-              <Image 
-                src="/logo.png" 
-                alt="easCE Logo" 
-                width={40} 
-                height={40} 
-                className="rounded-lg"
-              />
-              <div className="text-2xl font-bold text-primary-600">
-                eas<span className="text-secondary-600">CE</span>
-              </div>
+            <div className="text-2xl font-bold text-primary-600">
+              eas<span className="text-secondary-600">CE</span>
             </div>
             <div className="hidden md:flex space-x-6">
               {!user ? (
                 <>
-                  <a href="#home" className="text-gray-700 hover:text-primary-600 transition-colors">Home</a>
-                  <a href="#about" className="text-gray-700 hover:text-primary-600 transition-colors">About</a>
-                  <a href="#features" className="text-gray-700 hover:text-primary-600 transition-colors">Features</a>
-                  <a href="#contact" className="text-gray-700 hover:text-primary-600 transition-colors">Contact</a>
+                  <a 
+                    href="#home" 
+                    onClick={(e) => scrollToSection(e, 'home')}
+                    className="text-gray-700 hover:text-primary-600 transition-colors"
+                  >
+                    Home
+                  </a>
+                  <a 
+                    href="#features" 
+                    onClick={(e) => scrollToSection(e, 'features')}
+                    className="text-gray-700 hover:text-primary-600 transition-colors"
+                  >
+                    Features
+                  </a>
+                  <a 
+                    href="#contact" 
+                    onClick={(e) => scrollToSection(e, 'contact')}
+                    className="text-gray-700 hover:text-primary-600 transition-colors"
+                  >
+                    Contact
+                  </a>
                 </>
               ) : (
                 <a href="/dashboard" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">Dashboard</a>
@@ -417,7 +435,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white section-padding">
+      <footer id="contact" className="bg-gray-900 text-white section-padding">
         <div className="container-max">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
