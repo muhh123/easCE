@@ -41,11 +41,16 @@ export default function Home() {
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
 
-  // Check for authenticated user on mount
+  // Check for authenticated user on mount and redirect if needed
   useEffect(() => {
     const checkUser = async () => {
       const currentUser = await getCurrentUser()
       setUser(currentUser)
+      
+      // Redirect to dashboard if user is logged in and on home page
+      if (currentUser && window.location.pathname === '/') {
+        window.location.href = '/dashboard';
+      }
     }
     checkUser()
 
@@ -53,6 +58,10 @@ export default function Home() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setUser(session?.user ?? null)
+        // Redirect to dashboard after successful login
+        if (session?.user && window.location.pathname === '/') {
+          window.location.href = '/dashboard';
+        }
       }
     )
 
@@ -111,10 +120,16 @@ export default function Home() {
               </div>
             </div>
             <div className="hidden md:flex space-x-6">
-              <a href="#home" className="text-gray-700 hover:text-primary-600 transition-colors">Home</a>
-              <a href="#about" className="text-gray-700 hover:text-primary-600 transition-colors">About</a>
-              <a href="#features" className="text-gray-700 hover:text-primary-600 transition-colors">Features</a>
-              <a href="#contact" className="text-gray-700 hover:text-primary-600 transition-colors">Contact</a>
+              {!user ? (
+                <>
+                  <a href="#home" className="text-gray-700 hover:text-primary-600 transition-colors">Home</a>
+                  <a href="#about" className="text-gray-700 hover:text-primary-600 transition-colors">About</a>
+                  <a href="#features" className="text-gray-700 hover:text-primary-600 transition-colors">Features</a>
+                  <a href="#contact" className="text-gray-700 hover:text-primary-600 transition-colors">Contact</a>
+                </>
+              ) : (
+                <a href="/dashboard" className="text-gray-700 hover:text-primary-600 transition-colors font-medium">Dashboard</a>
+              )}
             </div>
           </div>
           
