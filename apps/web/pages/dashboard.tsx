@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { LogOut, Users, Calculator, Droplets, Building2 } from 'lucide-react';
+import { LogOut, Users, Calculator, Droplets, Building2, Loader2, ArrowRight } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import Link from 'next/link';
 import { getCurrentUser, signOut, supabase } from '../lib/supabase';
 
 interface User {
@@ -16,9 +18,20 @@ interface User {
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [activeUsers, setActiveUsers] = useState(1247);
+  const [activeUsers, setActiveUsers] = useState(0);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [motivationalMessage, setMotivationalMessage] = useState('');
+
+  // Motivational messages array
+  const motivationalMessages = [
+    "Every problem you solve brings you one step closer to acing your CE board exam.",
+    "Consistent practice is the key to mastery. You've got this!",
+    "Your dedication to studying today will shape your success tomorrow.",
+    "Great engineers are built one problem at a time. Keep going!",
+    "The more you practice, the more confident you'll become."
+  ];
 
   const topics = [
     { id: 'math', name: 'Mathematics', icon: <Calculator className="w-6 h-6" />, color: 'bg-blue-100 text-blue-600' },
@@ -50,17 +63,38 @@ export default function Dashboard() {
     };
     checkAuth();
 
-    // Simulate active users counter (you can replace this with real data)
+    // Set a consistent message on client-side only
+    setMotivationalMessage(motivationalMessages[0]);
+    
+    // Simulate active users count
     const interval = setInterval(() => {
-      setActiveUsers(prev => prev + Math.floor(Math.random() * 3) - 1);
+      setActiveUsers(prev => {
+        const change = Math.floor(Math.random() * 10) - 3; // Random number between -3 and 6
+        return Math.max(0, prev + change);
+      });
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [router]);
+  }, [motivationalMessages, router]);
 
   const handleSignOut = async () => {
     await signOut();
     router.push('/');
+  };
+
+  const fetchQuestions = async (topic: string, difficulty: string) => {
+    setIsLoading(true);
+    try {
+      // Navigate to practice page with topic and difficulty as URL parameters
+      router.push({
+        pathname: '/practice',
+        query: { topic, difficulty },
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to start practice session. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -125,13 +159,7 @@ export default function Dashboard() {
                 {new Date().getHours() < 12 ? '! 🌞' : new Date().getHours() < 18 ? '! 🌤️' : '! 🌙'}
               </h1>
               <p className="text-gray-600 mt-2">
-                {[
-                  "Every problem you solve brings you one step closer to acing your CE board exam.",
-                  "Consistent practice is the key to mastery. You've got this!",
-                  "Your dedication to studying today will shape your success tomorrow.",
-                  "Great engineers are built one problem at a time. Keep going!",
-                  "The more you practice, the more confident you'll become."
-                ][Math.floor(Math.random() * 5)]}
+                {motivationalMessage || "Loading..."}
               </p>
             </div>
             <div className="mt-4 md:mt-0 flex items-center space-x-2 text-sm text-gray-600 md:hidden">
@@ -170,18 +198,18 @@ export default function Dashboard() {
 
             {selectedTopic && (
               <div className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-2xl font-semibold text-gray-900 text-center mb-4">
                   Select Difficulty
                 </h2>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex justify-center gap-3">
                   {difficulties.map((difficulty) => (
                     <button
                       key={difficulty.id}
                       onClick={() => setSelectedDifficulty(difficulty.id)}
-                      className={`px-6 py-3 rounded-lg border-2 transition-all duration-200 font-medium ${
+                      className={`px-6 py-2 rounded-md border-2 font-medium ${
                         selectedDifficulty === difficulty.id
                           ? 'border-primary-500 bg-primary-50 text-primary-700'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700'
+                          : 'border-gray-200 hover:bg-gray-50 text-gray-700'
                       }`}
                     >
                       {difficulty.name}
@@ -193,15 +221,27 @@ export default function Dashboard() {
 
             {selectedTopic && selectedDifficulty && (
               <div className="flex justify-center mt-8">
-                <button
-                  onClick={handleStartPractice}
-                  className="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg shadow-md transition-colors duration-200 flex items-center space-x-2"
+                <Button
+                  onClick={() => {
+                    if (selectedTopic && selectedDifficulty) {
+                      fetchQuestions(selectedTopic, selectedDifficulty);
+                    }
+                  }}
+                  disabled={!selectedTopic || !selectedDifficulty || isLoading}
+                  className="mt-6 w-full md:w-auto"
                 >
-                  <span>Start {selectedTopic} Practice ({selectedDifficulty})</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </button>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      Start Practice
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
               </div>
             )}
           </div>
